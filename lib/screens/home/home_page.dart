@@ -32,6 +32,13 @@ class _HomePageState extends State<HomePage> {
               },
               child: Text('Go to Contact Page'),
             ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/addTreasure');
+              },
+              child: Text('addTreasure'),
+            ),
           ],
         ),
       ),

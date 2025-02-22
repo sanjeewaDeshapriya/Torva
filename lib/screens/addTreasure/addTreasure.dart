@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
-class AddTreasurePage extends StatelessWidget {
+class AddTreasurePage extends StatefulWidget {
   const AddTreasurePage({super.key});
 
   @override
+  AddTreasurePageState createState() => AddTreasurePageState();
+}
+
+class AddTreasurePageState extends State<AddTreasurePage> {
+  int selectedDifficulty = 1;
+
   Widget build(BuildContext context) {
     return Scaffold(
+      // APP Bar
       appBar: AppBar(
         title: const Text(
           'Add Treasure',
@@ -47,38 +54,25 @@ class AddTreasurePage extends StatelessWidget {
     );
   }
 
+  // Helper methods for TextField, LocationField, DifficultySelector, PhotoUploader, DescriptionField, and ActionButtons
+  // Title and Hint TextField
+
   Widget buildTextField(String label, String hint) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
           decoration: InputDecoration(
             hintText: hint,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25),
-            ),
-            filled: true,
-            fillColor: Colors.white,
-          ),
-        )
-      ],
-    );
-  }
-
-  Widget buildLocationField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Location',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        const SizedBox(height: 8),
-        TextField(
-          decoration: InputDecoration(
-            hintText: 'Colombo 07, Sri Lanka',
-            suffixIcon: const Icon(Icons.location_on),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
             filled: true,
             fillColor: Colors.white,
@@ -88,34 +82,111 @@ class AddTreasurePage extends StatelessWidget {
     );
   }
 
+  // Location Field
+
+  Widget buildLocationField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Location',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          decoration: InputDecoration(
+            hintText: 'Colombo 07, Sri Lanka',
+            suffixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF7033FA)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Difficulty Selector
+
   Widget buildDifficultySelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Difficulty Level',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        const Text(
+          'Difficulty Level',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             ...List.generate(5, (index) {
-              return const Icon(Icons.local_fire_department,
-                  size: 40, color: Color(0xFF7033FA));
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedDifficulty = index + 1;
+                  });
+                },
+                child: Icon(
+                  Icons.local_fire_department,
+                  size: 40,
+                  color:
+                      index < selectedDifficulty
+                          ? const Color(0xFF7033FA)
+                          : Colors.grey.shade400,
+                ),
+              );
             }),
-            const SizedBox(width: 140),
-            const Text('Easy', style: TextStyle(color: Color(0xFF7033FA))),
+            const SizedBox(width: 110),
+            Text(
+              getDifficultyText(selectedDifficulty),
+              style: const TextStyle(color: Color(0xFF7033FA), fontSize: 16, fontWeight: FontWeight.w500),
+            ),
           ],
         ),
       ],
     );
   }
 
+  // Get Difficulty Text
+String getDifficultyText(int level) {
+    switch (level) {
+      case 1:
+        return 'Easy';
+      case 2:
+        return 'Medium';
+      case 3:
+        return 'Hard';
+      case 4:
+        return 'Very Hard';
+      case 5:
+        return 'Extreme';
+      default:
+        return 'Easy';
+    }
+  }
+
+// Photo Uploader
   Widget buildPhotoUploader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Add Photos',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        const Text(
+          'Add Photos',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
@@ -128,15 +199,15 @@ class AddTreasurePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
-              Icon(Icons.image,
-                  size: 30, color: Color.fromARGB(255, 99, 98, 98)),
+              Icon(
+                Icons.image,
+                size: 30,
+                color: Color.fromARGB(255, 99, 98, 98),
+              ),
               SizedBox(height: 4),
               Text(
                 'Select File',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
             ],
           ),
@@ -145,28 +216,20 @@ class AddTreasurePage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: Divider(
-                color: Colors.black,
-                thickness: 1,
-              ),
-            ),
+            Expanded(child: Divider(color: Colors.black, thickness: 1)),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text('or',
-                  style: TextStyle(color: Colors.black, fontSize: 12)),
-            ),
-            Expanded(
-              child: Divider(
-                color: Colors.black,
-                thickness: 1,
+              child: Text(
+                'or',
+                style: TextStyle(color: Colors.black, fontSize: 12),
               ),
             ),
+            Expanded(child: Divider(color: Colors.black, thickness: 1)),
           ],
         ),
         const SizedBox(height: 8),
         Container(
-          margin: const EdgeInsets.symmetric(vertical:4),
+          margin: const EdgeInsets.symmetric(vertical: 4),
           width: double.infinity,
           child: ElevatedButton.icon(
             onPressed: () {},
@@ -192,12 +255,19 @@ class AddTreasurePage extends StatelessWidget {
     );
   }
 
+  // Description Field
   Widget buildDescriptionField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Description',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        const Text(
+          'Description',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
         const SizedBox(height: 8),
         TextField(
           maxLines: 5,
@@ -211,6 +281,9 @@ class AddTreasurePage extends StatelessWidget {
       ],
     );
   }
+
+
+// Action Buttons
 
   Widget buildActionButtons(BuildContext context) {
     return Container(
@@ -230,8 +303,10 @@ class AddTreasurePage extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: const Text('Cancel',
-                    style: TextStyle(color: Colors.black, fontSize: 20)),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.black, fontSize: 20),
+                ),
               ),
             ),
           ),
@@ -244,8 +319,10 @@ class AddTreasurePage extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: const Text('Save',
-                    style: TextStyle(color: Colors.white, fontSize: 20)),
+                child: const Text(
+                  'Save',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
               ),
             ),
           ),
