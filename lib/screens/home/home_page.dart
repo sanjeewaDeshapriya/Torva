@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:torva/widgets/app_bar.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -37,7 +39,7 @@ class _HomePageState extends State<HomePage> {
               onPressed: () {
                 Navigator.pushNamed(context, '/addTreasure');
               },
-              child: Text('addTreasure'),
+              child: Text('Go to Add Tresure Page'),
             ),
           ],
         ),
