@@ -10,6 +10,7 @@ class AddTreasurePage extends StatefulWidget {
 class AddTreasurePageState extends State<AddTreasurePage> {
   int selectedDifficulty = 1;
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // APP Bar
@@ -145,7 +146,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
                 ),
               );
             }),
-            const SizedBox(width: 110),
+            const SizedBox(width: 105),
             Text(
               getDifficultyText(selectedDifficulty),
               style: const TextStyle(color: Color(0xFF7033FA), fontSize: 16, fontWeight: FontWeight.w500),
