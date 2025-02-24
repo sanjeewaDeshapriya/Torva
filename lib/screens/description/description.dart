@@ -5,6 +5,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,6 +17,8 @@ class MyApp extends StatelessWidget {
 }
 
 class DescriptionScreen extends StatelessWidget {
+  const DescriptionScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -176,7 +180,7 @@ class InfoCard extends StatelessWidget {
   final String title;
   final String value;
 
-  InfoCard({required this.icon, required this.title, required this.value});
+  const InfoCard({super.key, required this.icon, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {
