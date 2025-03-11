@@ -96,19 +96,16 @@ class DescriptionScreen extends StatelessWidget {
               InfoCard(
                 icon: Icons.lightbulb_outline,
                 title: 'Hint',
-                value: 'Lorem ipsum dolor...',
               ),
               SizedBox(height: 10),
               InfoCard(
                 icon: Icons.description_outlined,
                 title: 'Description',
-                value: 'Lorem ipsum dolor...',
               ),
               SizedBox(height: 10),
               InfoCard(
                 icon: Icons.history_outlined,
                 title: 'Past Logs',
-                value: 'Found it on 2025-...',
               ),
               SizedBox(height: 20),
               Row(
