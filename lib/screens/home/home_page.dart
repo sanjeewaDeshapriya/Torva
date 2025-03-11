@@ -55,6 +55,13 @@ class _HomePageState extends State<HomePage> {
               },
               child: Text('Go to Leading Board'),
             ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/profilepage');
+              },
+              child: Text('Go to ProfilePage'),
+            ),
           ],
         ),
       ),
