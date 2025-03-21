@@ -55,8 +55,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
     );
   }
 
-  // Helper methods for TextField, LocationField, DifficultySelector, PhotoUploader, DescriptionField, and ActionButtons
-  // Title and Hint TextField
+  // Text Field
 
   Widget buildTextField(String label, String hint) {
     return Column(
@@ -158,6 +157,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
   }
 
   // Get Difficulty Text
+
 String getDifficultyText(int level) {
     switch (level) {
       case 1:
@@ -176,6 +176,7 @@ String getDifficultyText(int level) {
   }
 
 // Photo Uploader
+
   Widget buildPhotoUploader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
