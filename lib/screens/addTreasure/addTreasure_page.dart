@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class AddTreasurePage extends StatefulWidget {
   const AddTreasurePage({super.key});
@@ -9,6 +11,26 @@ class AddTreasurePage extends StatefulWidget {
 
 class AddTreasurePageState extends State<AddTreasurePage> {
   int selectedDifficulty = 1;
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImageFromGallery() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _takePhoto() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +122,10 @@ class AddTreasurePageState extends State<AddTreasurePage> {
         TextField(
           decoration: InputDecoration(
             hintText: 'Colombo 07, Sri Lanka',
-            suffixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF7033FA)),
+            suffixIcon: const Icon(
+              Icons.location_on_outlined,
+              color: Color(0xFF7033FA),
+            ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
             filled: true,
             fillColor: Colors.white,
@@ -148,7 +173,11 @@ class AddTreasurePageState extends State<AddTreasurePage> {
             const SizedBox(width: 105),
             Text(
               getDifficultyText(selectedDifficulty),
-              style: const TextStyle(color: Color(0xFF7033FA), fontSize: 16, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                color: Color(0xFF7033FA),
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -158,7 +187,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
 
   // Get Difficulty Text
 
-String getDifficultyText(int level) {
+  String getDifficultyText(int level) {
     switch (level) {
       case 1:
         return 'Easy';
@@ -175,7 +204,7 @@ String getDifficultyText(int level) {
     }
   }
 
-// Photo Uploader
+  // Photo Uploader
 
   Widget buildPhotoUploader() {
     return Column(
@@ -190,28 +219,41 @@ String getDifficultyText(int level) {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          width: double.infinity,
-          height: 150,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: Colors.grey),
-            color: Colors.white,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(
-                Icons.image,
-                size: 30,
-                color: Color.fromARGB(255, 99, 98, 98),
+        GestureDetector(
+          onTap: _pickImageFromGallery,
+          child: Container(
+            width: double.infinity,
+            height: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(color: Colors.grey),
+              color: Colors.white,
+            ),
+            child: _image == null ?
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.image,
+                  size: 30,
+                  color: Color.fromARGB(255, 99, 98, 98),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Select File',
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                ),
+              ],
+            )
+            : ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Image.file(
+                _image!,
+                width: double.infinity,
+                height: 150,
+                fit: BoxFit.cover,
               ),
-              SizedBox(height: 4),
-              Text(
-                'Select File',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-            ],
+            ),
           ),
         ),
         const SizedBox(height: 8),
@@ -234,7 +276,7 @@ String getDifficultyText(int level) {
           margin: const EdgeInsets.symmetric(vertical: 4),
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: () {},
+            onPressed: _takePhoto,
             icon: Container(
               child: const Icon(Icons.camera_alt, color: Color(0xFF7033FA)),
             ),
@@ -284,8 +326,7 @@ String getDifficultyText(int level) {
     );
   }
 
-
-// Action Buttons
+  // Action Buttons
 
   Widget buildActionButtons(BuildContext context) {
     return Container(

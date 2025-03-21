@@ -18,7 +18,7 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
-      home: (context) => ProfilePage(),
+      home: (context) => AddTreasurePage(),
       about: (context) => AboutPage(),
       contact: (context) => ContactPage(),
       addTreasure: (context) => AddTreasurePage(),
