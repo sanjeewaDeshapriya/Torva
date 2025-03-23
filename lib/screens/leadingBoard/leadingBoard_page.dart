@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:torva/screens/home/home_page.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: LeaderboardScreen(),
-    );
-  }
-}
-
 class LeaderboardScreen extends StatefulWidget {
+  const LeaderboardScreen({super.key});
+
   @override
   _LeaderboardScreenState createState() => _LeaderboardScreenState();
 }
