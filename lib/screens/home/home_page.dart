@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:torva/widgets/app_bar.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -31,6 +33,34 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pushNamed(context, '/contact');
               },
               child: Text('Go to Contact Page'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/addTreasure');
+              },
+              child: Text('Go to Add Tresure Page'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/description');
+              },
+              child: Text('Go to Description Page'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/leadingboard');
+              },
+              child: Text('Go to Leading Board'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/profilepage');
+              },
+              child: Text('Go to ProfilePage'),
             ),
           ],
         ),
