@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "158645438654",
+    "project_id": "torva-app",
+    "storage_bucket": "torva-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:158645438654:android:83062e4ef0d36bb781f6ef",
+        "android_client_info": {
+          "package_name": "com.example.torva"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "158645438654-jl8rd4revd9vq2b9prnjj8vtec3k7a93.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.torva",
+            "certificate_hash": "3e7de722c0b91021e72880b40475dcf99c40dea0"
+          }
+        },
+        {
+          "client_id": "158645438654-08unmsdc3ef94hj2lklgo1lkpictve50.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-Ov4uCxod4V7VEVDBhHMG7fTZhVxW9_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "158645438654-08unmsdc3ef94hj2lklgo1lkpictve50.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

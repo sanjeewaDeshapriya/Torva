@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:torva/screens/description/description_page.dart';
+// import 'package:torva/screens/home/home_page.dart';
 import 'package:torva/screens/leadingBoard/leadingBoard_page.dart';
 import 'package:torva/screens/profile/profile_page.dart';
-import '../screens/home/home_page.dart';
+import 'package:torva/screens/screens/wrapper.dart';
 import '../screens/about/about_page.dart';
 import '../screens/contact/contact_page.dart';
 import '../screens/addTreasure/addTreasure_page.dart';
@@ -18,7 +20,8 @@ class AppRoutes {
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
-      home: (context) => AddTreasurePage(),
+
+      home: (context) =>Wrapper() ,
       about: (context) => AboutPage(),
       contact: (context) => ContactPage(),
       addTreasure: (context) => AddTreasurePage(),
