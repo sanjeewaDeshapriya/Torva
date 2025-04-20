@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:torva/screens/screens/authentication/login.dart';
 
 class Regester extends StatefulWidget {
   const Regester({super.key});
@@ -186,7 +187,10 @@ class _RegesterState extends State<Regester> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Implement sign up logic here
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Login()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF8A2BE2), // Purple color

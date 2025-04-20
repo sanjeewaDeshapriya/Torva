@@ -81,7 +81,12 @@ class _WrapperState extends State<Wrapper> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Authanticate(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF8A2BE2), // Purple color
