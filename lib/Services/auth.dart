@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:torva/models/userModel.dart';
 
@@ -10,9 +9,9 @@ class AuthService {
     return user != null ? Usermodel(uid: user.uid) : null;
   }
 
-  // Stream<Usermodel> get user {
-  //   _auth.authStateChanges().map(_userWithFirebaseUID(user));
-  // }
+  Stream<Usermodel?> get user {
+    return _auth.authStateChanges().map(_userWithFirebaseUID);
+  }
 
   Future signInAnonymously() async {
     try {
