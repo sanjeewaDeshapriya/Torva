@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:torva/screens/screens/authentication/login.dart';
+// import 'package:torva/screens/screens/authentication/login.dart';
 import 'package:torva/screens/screens/authentication/regester.dart';
 
 class Authanticate extends StatefulWidget {

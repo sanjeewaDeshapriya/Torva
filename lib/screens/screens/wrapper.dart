@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:torva/models/userModel.dart';
+import 'package:torva/screens/home/home_page.dart';
 import 'package:torva/screens/screens/authentication/authenticate.dart';
 
 class Wrapper extends StatefulWidget {
@@ -10,8 +13,14 @@ class Wrapper extends StatefulWidget {
 
 class _WrapperState extends State<Wrapper> {
   final bool isverified = true;
+
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<Usermodel?>(context);
+    if (user != null) {
+      return HomePage();
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(

@@ -4,12 +4,14 @@ class InfoCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? value;
+  final VoidCallback? onTap;
 
   const InfoCard({
     super.key,
     required this.icon,
     required this.title,
-    this.value,
+    this.value, 
+    this.onTap,
   });
 
   @override
@@ -17,6 +19,7 @@ class InfoCard extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: ListTile(
+        onTap: onTap,
         leading: Icon(icon, color: Color(0xFF7033FA), size: 30),
         title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
         trailing:

@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:torva/Services/auth.dart';
 import 'package:torva/widgets/info_card.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +79,17 @@ class ProfilePage extends StatelessWidget {
               SizedBox(height: 10),
               InfoCard(icon: Icons.settings, title: 'Settings'),
               SizedBox(height: 10),
-              InfoCard(icon: Icons.exit_to_app, title: 'Exit'),
+              InfoCard(
+                icon: Icons.exit_to_app,
+                title: 'Exit',
+                onTap: () async {
+                  print('Exit tapped');
+
+                  await _auth.signOut();
+                  // ignore: use_build_context_synchronously
+                  Navigator.pushReplacementNamed(context, '/wrapper');
+                },
+              ),
               SizedBox(height: 20),
             ],
           ),
