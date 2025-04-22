@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:torva/Services/auth.dart';
 import 'package:torva/screens/screens/authentication/login.dart';
 
 class Regester extends StatefulWidget {
@@ -11,6 +12,8 @@ class Regester extends StatefulWidget {
 class _RegesterState extends State<Regester> {
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
+
+  final AuthService _auth = AuthService();
 
   // Controllers for form fields
   final TextEditingController _usernameController = TextEditingController();
@@ -39,7 +42,7 @@ class _RegesterState extends State<Regester> {
   }
 
   // Method to handle form submission
-  void _submitForm() {
+  void _submitForm() async{
     if (_formKey.currentState!.validate()) {
       // Save the form data
       _formKey.currentState!.save();
@@ -48,6 +51,18 @@ class _RegesterState extends State<Regester> {
       print('Username: $_username');
       print('Email: $_email');
       print('Password: $_password');
+
+      _auth.registerWithEmailAndPassword(_email, _password).then((value) {
+        if (value != null) {
+          // Registration successful
+          print('User registered successfully');
+        } else {
+          // Registration failed
+          print('Registration failed');
+        }
+      });
+
+
 
       // Here you would typically call your authentication service
       // For example: _authService.createUserWithEmailAndPassword(_email, _password);

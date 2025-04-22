@@ -181,7 +181,10 @@ class _LoginState extends State<Login> {
                         print('Username: $_username');
                         print('Password: $_password');
 
-                        dynamic result = await _auth.signInAnonymously();
+                        dynamic result = await _auth.signInWithEmailAndPassword(
+                          _username,
+                          _password,
+                        );
                         if (result == null) {
                           // Show an error message
                           ScaffoldMessenger.of(context).showSnackBar(
