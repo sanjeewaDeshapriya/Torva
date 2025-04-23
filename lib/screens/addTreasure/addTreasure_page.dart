@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:torva/Services/treasure_service.dart';
+import 'package:torva/models/treasure_model.dart';
 
 class AddTreasurePage extends StatefulWidget {
   const AddTreasurePage({super.key});
@@ -10,9 +12,28 @@ class AddTreasurePage extends StatefulWidget {
 }
 
 class AddTreasurePageState extends State<AddTreasurePage> {
+  final _formKey = GlobalKey<FormState>();
   int selectedDifficulty = 1;
   File? _image;
+  bool _isLoading = false;
   final ImagePicker _picker = ImagePicker();
+  final TreasureService _treasureService = TreasureService();
+
+  // Form controllers
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _hintController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Dispose controllers when widget is disposed
+    _titleController.dispose();
+    _locationController.dispose();
+    _hintController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImageFromGallery() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -32,10 +53,67 @@ class AddTreasurePageState extends State<AddTreasurePage> {
     }
   }
 
+  Future<void> _saveTreasure() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        setState(() {
+          _isLoading = true;
+        });
+
+        // Upload image if selected
+        List<String> photoUrls = [];
+        if (_image != null) {
+          String url = await _treasureService.uploadImage(_image!);
+          photoUrls.add(url);
+        }
+
+        print('Title: ${_titleController.text}');
+        print('Location: ${_locationController.text}');
+        print('Hint: ${_hintController.text}');
+        print('Difficulty Level: $selectedDifficulty');
+        print('Photo URLs: $photoUrls');
+        print('Description: ${_descriptionController.text}');
+
+        // Create treasure object
+        final treasure = Treasure(
+          title: _titleController.text,
+          location: _locationController.text,
+          hint: _hintController.text,
+          difficultyLevel: selectedDifficulty,
+          photoUrls: photoUrls,
+          description: _descriptionController.text,
+        );
+
+        // Save to Firebase
+        await _treasureService.addTreasure(treasure);
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Treasure added successfully!')),
+        );
+
+        // Navigate back
+        Navigator.pop(context);
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Show error message
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // APP Bar
       appBar: AppBar(
         title: const Text(
           'Add Treasure',
@@ -53,33 +131,72 @@ class AddTreasurePageState extends State<AddTreasurePage> {
         backgroundColor: Color(0xFFF2F2F2),
       ),
       backgroundColor: Color(0xFFF2F2F2),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            buildTextField('Title', 'Treasure of Cortés'),
-            const SizedBox(height: 30),
-            buildLocationField(),
-            const SizedBox(height: 30),
-            buildTextField('Hint', 'Treasure of Cortés'),
-            const SizedBox(height: 30),
-            buildDifficultySelector(),
-            const SizedBox(height: 30),
-            buildPhotoUploader(),
-            const SizedBox(height: 30),
-            buildDescriptionField(),
-            const SizedBox(height: 32),
-            buildActionButtons(context),
-          ],
-        ),
+      body: Stack(
+        children: [
+          Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  buildFormField(
+                    label: 'Title',
+                    hint: 'Treasure of Cortés',
+                    controller: _titleController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a title';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  buildLocationField(),
+                  const SizedBox(height: 30),
+                  buildFormField(
+                    label: 'Hint',
+                    hint: 'Treasure of Cortés',
+                    controller: _hintController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a hint';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                  buildDifficultySelector(),
+                  const SizedBox(height: 30),
+                  buildPhotoUploader(),
+                  const SizedBox(height: 30),
+                  buildDescriptionField(),
+                  const SizedBox(height: 32),
+                  buildActionButtons(context),
+                ],
+              ),
+            ),
+          ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF7033FA)),
+              ),
+            ),
+        ],
       ),
     );
   }
 
-  // Text Field
-
-  Widget buildTextField(String label, String hint) {
+  // Form Field
+  Widget buildFormField({
+    required String label,
+    required String hint,
+    required TextEditingController controller,
+    required String? Function(String?) validator,
+    int maxLines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -92,12 +209,20 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
+          controller: controller,
+          style: TextStyle(color: Colors.black),
+          maxLines: maxLines,
+          validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
             filled: true,
             fillColor: Colors.white,
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: BorderSide(color: Colors.red),
+            ),
           ),
         ),
       ],
@@ -105,7 +230,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
   }
 
   // Location Field
-
   Widget buildLocationField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +243,15 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
+          controller: _locationController,
+          style: TextStyle(color: Colors.black),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a location';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             hintText: 'Colombo 07, Sri Lanka',
             suffixIcon: const Icon(
@@ -129,6 +261,10 @@ class AddTreasurePageState extends State<AddTreasurePage> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
             filled: true,
             fillColor: Colors.white,
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: BorderSide(color: Colors.red),
+            ),
           ),
         ),
       ],
@@ -136,7 +272,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
   }
 
   // Difficulty Selector
-
   Widget buildDifficultySelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,7 +321,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
   }
 
   // Get Difficulty Text
-
   String getDifficultyText(int level) {
     switch (level) {
       case 1:
@@ -205,7 +339,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
   }
 
   // Photo Uploader
-
   Widget buildPhotoUploader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,31 +362,32 @@ class AddTreasurePageState extends State<AddTreasurePage> {
               border: Border.all(color: Colors.grey),
               color: Colors.white,
             ),
-            child: _image == null ?
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(
-                  Icons.image,
-                  size: 30,
-                  color: Color.fromARGB(255, 99, 98, 98),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Select File',
-                  style: TextStyle(color: Colors.grey, fontSize: 16),
-                ),
-              ],
-            )
-            : ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Image.file(
-                _image!,
-                width: double.infinity,
-                height: 150,
-                fit: BoxFit.cover,
-              ),
-            ),
+            child:
+                _image == null
+                    ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.image,
+                          size: 30,
+                          color: Color.fromARGB(255, 99, 98, 98),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Select File',
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                        ),
+                      ],
+                    )
+                    : ClipRRect(
+                      borderRadius: BorderRadius.circular(25),
+                      child: Image.file(
+                        _image!,
+                        width: double.infinity,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
           ),
         ),
         const SizedBox(height: 8),
@@ -313,13 +447,25 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           ),
         ),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
+          controller: _descriptionController,
+          style: TextStyle(color: Colors.black),
           maxLines: 5,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a description';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             hintText: 'Enter description here...',
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
             filled: true,
             fillColor: Colors.white,
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(25),
+              borderSide: BorderSide(color: Colors.red),
+            ),
           ),
         ),
       ],
@@ -327,7 +473,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
   }
 
   // Action Buttons
-
   Widget buildActionButtons(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -356,9 +501,10 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: _isLoading ? null : _saveTreasure,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF7033FA),
+                disabledBackgroundColor: Color(0xFF7033FA).withOpacity(0.5),
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
