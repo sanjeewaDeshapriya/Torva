@@ -6,6 +6,7 @@ import 'package:torva/screens/leadingBoard/leadingBoard_page.dart';
 import 'package:torva/screens/profile/profile_page.dart';
 import 'package:torva/screens/screens/authentication/login.dart';
 import 'package:torva/screens/screens/wrapper.dart';
+import 'package:torva/screens/treasurelist/treasure_list.dart';
 import '../screens/about/about_page.dart';
 import '../screens/contact/contact_page.dart';
 import '../screens/addTreasure/addTreasure_page.dart';
@@ -20,6 +21,7 @@ class AppRoutes {
   static const String profilepage = '/profilepage';
   static const String wrapper = '/wrapper';
   static const String login = '/login';
+  static const String treasurelist = '/treasurelist';
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -32,6 +34,7 @@ class AppRoutes {
       profilepage: (context) => ProfilePage(),
       wrapper: (context) => Wrapper(),
       login: (context) => Login(),
+      treasurelist: (context) => TreasureListScreen(),
     };
   }
 }

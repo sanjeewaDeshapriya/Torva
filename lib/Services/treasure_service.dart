@@ -5,8 +5,6 @@ import 'package:torva/models/treasure_model.dart';
 import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as path;
 
-
-
 class TreasureService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -16,7 +14,9 @@ class TreasureService {
   // Add a new treasure to Firestore
   Future<String> addTreasure(Treasure treasure) async {
     try {
-      final docRef = await _firestore.collection(_collectionName).add(treasure.toMap());
+      final docRef = await _firestore
+          .collection(_collectionName)
+          .add(treasure.toMap());
       return docRef.id;
     } catch (e) {
       print('Error adding treasure: $e');
@@ -29,11 +29,11 @@ class TreasureService {
     try {
       final fileName = '${_uuid.v4()}${path.extension(imageFile.path)}';
       final storageRef = _storage.ref().child('treasure_images/$fileName');
-      
+
       // Upload the file
       final uploadTask = storageRef.putFile(imageFile);
       await uploadTask.whenComplete(() => null);
-      
+
       // Get download URL
       final downloadUrl = await storageRef.getDownloadURL();
       return downloadUrl;
@@ -46,12 +46,12 @@ class TreasureService {
   // Upload multiple images and return list of download URLs
   Future<List<String>> uploadImages(List<File> imageFiles) async {
     List<String> downloadUrls = [];
-    
+
     for (var imageFile in imageFiles) {
       final url = await uploadImage(imageFile);
       downloadUrls.add(url);
     }
-    
+
     return downloadUrls;
   }
 
@@ -62,17 +62,17 @@ class TreasureService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Treasure.fromMap(doc.id, doc.data());
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return Treasure.fromMap(doc.id, doc.data());
+          }).toList();
+        });
   }
 
   // Get a specific treasure by ID
   Future<Treasure?> getTreasureById(String id) async {
     try {
       final doc = await _firestore.collection(_collectionName).doc(id).get();
-      
+
       if (doc.exists) {
         return Treasure.fromMap(doc.id, doc.data()!);
       } else {
@@ -87,7 +87,10 @@ class TreasureService {
   // Update an existing treasure
   Future<void> updateTreasure(String id, Treasure treasure) async {
     try {
-      await _firestore.collection(_collectionName).doc(id).update(treasure.toMap());
+      await _firestore
+          .collection(_collectionName)
+          .doc(id)
+          .update(treasure.toMap());
     } catch (e) {
       print('Error updating treasure: $e');
       rethrow;
@@ -99,7 +102,7 @@ class TreasureService {
     try {
       // Delete the document
       await _firestore.collection(_collectionName).doc(treasure.id).delete();
-      
+
       // Delete associated images
       for (String photoUrl in treasure.photoUrls) {
         try {
@@ -124,10 +127,10 @@ class TreasureService {
         .where('location', isEqualTo: location)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Treasure.fromMap(doc.id, doc.data());
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return Treasure.fromMap(doc.id, doc.data());
+          }).toList();
+        });
   }
 
   // Query treasures by difficulty level
@@ -137,9 +140,63 @@ class TreasureService {
         .where('difficultyLevel', isEqualTo: difficultyLevel)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return Treasure.fromMap(doc.id, doc.data());
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            return Treasure.fromMap(doc.id, doc.data());
+          }).toList();
+        });
+  }
+
+  Future<void> toggleFavoriteTreasure(
+    String treasureId,
+    bool currentFavoriteStatus,
+  ) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('treasures')
+          .doc(treasureId)
+          .update({'isFavorite': !currentFavoriteStatus});
+    } catch (e) {
+      print('Error toggling favorite status: $e');
+      throw e; // Re-throw to allow handling in the UI
+    }
+  }
+
+  Stream<List<Treasure>> getFavoriteTreasures() {
+    return FirebaseFirestore.instance
+        .collection('treasures')
+        .where('isFavorite', isEqualTo: true)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            return Treasure.fromMap(doc.id, doc.data());
+          }).toList();
+        });
+  }
+
+  Stream<List<Treasure>> searchTreasures(String query) {
+    // Convert query to lowercase for case-insensitive search
+    query = query.toLowerCase();
+
+    // If query is empty, return all treasures
+    if (query.isEmpty) {
+      return getTreasures();
+    }
+
+    // Search by title, description, or location
+    // Note: This uses basic string contains operators, which is not optimal for large datasets
+    // For production, consider implementing a more advanced search solution
+    return FirebaseFirestore.instance
+        .collection('treasures')
+        .orderBy('title')
+        .startAt([query])
+        .endAt(
+          ['$query\uf8ff'],
+        ) // \uf8ff is a high code point to match all characters starting with query
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs.map((doc) {
+            return Treasure.fromMap(doc.id, doc.data());
+          }).toList();
+        });
   }
 }

@@ -97,7 +97,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
         );
 
         // Navigate back
-        Navigator.pop(context);
       } catch (e) {
         setState(() {
           _isLoading = false;

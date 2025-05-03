@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Treasure {
   final String id;
   final String title;
@@ -7,6 +9,7 @@ class Treasure {
   final List<String> photoUrls;
   final String description;
   final DateTime createdAt;
+  final bool isFavorite;
 
   Treasure({
     this.id = '',
@@ -17,6 +20,7 @@ class Treasure {
     this.photoUrls = const [],
     required this.description,
     DateTime? createdAt,
+    this.isFavorite = false,
   }) : createdAt = createdAt ?? DateTime.now();
 
   // Convert Treasure to a Map for storing in Firebase
@@ -29,6 +33,7 @@ class Treasure {
       'photoUrls': photoUrls,
       'description': description,
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'isFavorite': isFavorite,
     };
   }
 
@@ -42,9 +47,13 @@ class Treasure {
       difficultyLevel: map['difficultyLevel'] ?? 1,
       photoUrls: List<String>.from(map['photoUrls'] ?? []),
       description: map['description'] ?? '',
-      createdAt: map['createdAt'] != null 
-          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt']) 
-          : DateTime.now(),
+      createdAt:
+          map['createdAt'] != null
+              ? ((map['createdAt'] is Timestamp)
+                  ? (map['createdAt'] as Timestamp).toDate()
+                  : DateTime.fromMillisecondsSinceEpoch(map['createdAt']))
+              : DateTime.now(),
+              isFavorite: map['isFavorite'] ?? false,
     );
   }
 
@@ -58,6 +67,7 @@ class Treasure {
     List<String>? photoUrls,
     String? description,
     DateTime? createdAt,
+    bool? isFavorite,
   }) {
     return Treasure(
       id: id ?? this.id,
@@ -68,6 +78,7 @@ class Treasure {
       photoUrls: photoUrls ?? this.photoUrls,
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 }
