@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:torva/Services/auth.dart';
+import 'package:torva/Services/user_service.dart';
+import 'package:torva/models/user.dart';
 import 'package:torva/screens/screens/authentication/login.dart';
 
 class Regester extends StatefulWidget {
@@ -12,6 +14,7 @@ class Regester extends StatefulWidget {
 class _RegesterState extends State<Regester> {
   // Form key for validation
   final _formKey = GlobalKey<FormState>();
+  final _userService = UserService();
 
   final AuthService _auth = AuthService();
 
@@ -41,8 +44,31 @@ class _RegesterState extends State<Regester> {
     super.dispose();
   }
 
+  Future<void> _saveUser() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        final user = UserModel(email: _email, username: _username);
+
+        // Save to Firebase
+        await _userService.addUser(user);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Treasure user successfully!')),
+        );
+
+        // Navigate back
+      } catch (e) {
+        // Show error message
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      }
+    }
+  }
+
   // Method to handle form submission
-  void _submitForm() async{
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       // Save the form data
       _formKey.currentState!.save();
@@ -51,6 +77,8 @@ class _RegesterState extends State<Regester> {
       print('Username: $_username');
       print('Email: $_email');
       print('Password: $_password');
+
+      _saveUser();
 
       _auth.registerWithEmailAndPassword(_email, _password).then((value) {
         if (value != null) {
@@ -61,8 +89,6 @@ class _RegesterState extends State<Regester> {
           print('Registration failed');
         }
       });
-
-
 
       // Here you would typically call your authentication service
       // For example: _authService.createUserWithEmailAndPassword(_email, _password);
