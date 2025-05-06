@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:torva/Services/treasure_service.dart';
 import 'package:torva/models/treasure_model.dart';
 import 'package:torva/screens/shared/TreasureCard.dart';
+import 'package:torva/screens/treasureDetails/TreasureDetailScreen.dart';
+
 
 class TreasureListScreen extends StatefulWidget {
   const TreasureListScreen({super.key});
@@ -34,6 +36,16 @@ class _TreasureListScreenState extends State<TreasureListScreen> {
     setState(() {
       _searchQuery = _searchController.text.toLowerCase();
     });
+  }
+
+  // Navigate to the treasure detail screen
+  void _navigateToTreasureDetail(Treasure treasure) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TreasureDetailScreen(treasure: treasure),
+      ),
+    );
   }
 
   @override
@@ -251,36 +263,79 @@ class _TreasureListScreenState extends State<TreasureListScreen> {
                       return const Center(child: Text('No treasures found'));
                     }
 
-                    return ListView.builder(
-                      itemCount: treasures.length,
-                      itemBuilder: (context, index) {
-                        final treasure = treasures[index];
-                        return TreasureCard(
-                          treasure: treasure,
-                          onFavoritePressed: () async {
-                            try {
-                              // Call the service method to update Firestore
-                              await _treasureService.toggleFavoriteTreasure(
-                                treasure.id,
-                                treasure.isFavorite,
-                              );
-                            } catch (e) {
-                              // Show error message to user
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Failed to update favorite status',
+                    // Use either map or list view based on the toggle
+                    if (_isMapView) {
+                      // List view
+                      return ListView.builder(
+                        itemCount: treasures.length,
+                        itemBuilder: (context, index) {
+                          final treasure = treasures[index];
+                          return TreasureCard(
+                            treasure: treasure,
+                            onFavoritePressed: () async {
+                              try {
+                                // Call the service method to update Firestore
+                                await _treasureService.toggleFavoriteTreasure(
+                                  treasure.id,
+                                  treasure.isFavorite,
+                                );
+                              } catch (e) {
+                                // Show error message to user
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Failed to update favorite status',
+                                    ),
                                   ),
-                                ),
-                              );
-                            }
-                          },
-                          onNavigatePressed: () {
-                            // Navigate to treasure details or map
-                          },
-                        );
-                      },
-                    );
+                                );
+                              }
+                            },
+                            onNavigatePressed: () {
+                              // Navigate to treasure details with map
+                              _navigateToTreasureDetail(treasure);
+                            },
+                          );
+                        },
+                      );
+                    } else {
+                      // Map view implementation
+                      // This would be implemented with Google Maps showing treasure locations
+                      // For now, we'll show a placeholder that directs users to implement this
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.map,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Map View Coming Soon',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF7033FA),
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isMapView = true;
+                                });
+                              },
+                              child: const Text('Switch to List View'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                   },
                 ),
               ),

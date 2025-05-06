@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:torva/models/userModel.dart';
 import 'package:torva/screens/home/home_page.dart';
-import 'package:torva/screens/screens/authentication/authenticate.dart';
+import 'package:torva/authentication/authentication/authenticate.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({super.key});

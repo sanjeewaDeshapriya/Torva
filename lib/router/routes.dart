@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:torva/screens/description/description_page.dart';
+import 'package:torva/screens/home/home_page.dart';
 // import 'package:torva/screens/home/home_page.dart';
 import 'package:torva/screens/leadingBoard/leadingBoard_page.dart';
 import 'package:torva/screens/profile/profile_page.dart';
-import 'package:torva/screens/screens/authentication/login.dart';
-import 'package:torva/screens/screens/wrapper.dart';
+import 'package:torva/authentication/authentication/login.dart';
+import 'package:torva/authentication/wrapper.dart';
 import 'package:torva/screens/treasurelist/treasure_list.dart';
 import '../screens/about/about_page.dart';
 import '../screens/contact/contact_page.dart';
@@ -22,6 +23,8 @@ class AppRoutes {
   static const String wrapper = '/wrapper';
   static const String login = '/login';
   static const String treasurelist = '/treasurelist';
+  static const String homepage = '/homepage';
+
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
@@ -35,6 +38,7 @@ class AppRoutes {
       wrapper: (context) => Wrapper(),
       login: (context) => Login(),
       treasurelist: (context) => TreasureListScreen(),
+      homepage: (context) => HomePage(), // Assuming you have a HomePage widget
     };
   }
 }

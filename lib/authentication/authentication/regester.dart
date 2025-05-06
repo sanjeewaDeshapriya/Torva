@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:torva/Services/auth.dart';
 import 'package:torva/Services/user_service.dart';
 import 'package:torva/models/user.dart';
-import 'package:torva/screens/screens/authentication/login.dart';
+import 'package:torva/authentication/authentication/login.dart';
 
 class Regester extends StatefulWidget {
   const Regester({super.key});

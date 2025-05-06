@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:torva/Services/auth.dart';
-import 'package:torva/screens/screens/authentication/regester.dart';
+import 'package:torva/authentication/authentication/regester.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -192,10 +192,7 @@ class _LoginState extends State<Login> {
                           );
                         } else {
                           print(result.uid);
-                          Navigator.pushReplacementNamed(
-                            context,
-                            '/profilepage',
-                          );
+                          Navigator.pushReplacementNamed(context, '/homepage');
                         }
                       }
                     },
