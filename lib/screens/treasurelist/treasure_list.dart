@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:torva/Services/treasure_service.dart';
 import 'package:torva/models/treasure_model.dart';
 import 'package:torva/screens/shared/TreasureCard.dart';
 import 'package:torva/screens/treasureDetails/TreasureDetailScreen.dart';
-
 
 class TreasureListScreen extends StatefulWidget {
   const TreasureListScreen({super.key});
@@ -15,7 +13,7 @@ class TreasureListScreen extends StatefulWidget {
 
 class _TreasureListScreenState extends State<TreasureListScreen> {
   final TreasureService _treasureService = TreasureService();
-  bool _isMapView = false;
+  bool _isMapView = true;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
@@ -305,11 +303,7 @@ class _TreasureListScreenState extends State<TreasureListScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.map,
-                              size: 64,
-                              color: Colors.grey[400],
-                            ),
+                            Icon(Icons.map, size: 64, color: Colors.grey[400]),
                             const SizedBox(height: 16),
                             Text(
                               'Map View Coming Soon',

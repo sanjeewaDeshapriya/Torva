@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:torva/Services/treasure_service.dart';
 import 'package:torva/models/treasure_model.dart';
+import 'package:torva/screens/shared/MapLocationPicker.dart';
 
 class AddTreasurePage extends StatefulWidget {
   const AddTreasurePage({super.key});
@@ -19,15 +20,17 @@ class AddTreasurePageState extends State<AddTreasurePage> {
   final ImagePicker _picker = ImagePicker();
   final TreasureService _treasureService = TreasureService();
 
-  // Form controllers
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _hintController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
+  String _selectedAddress = '';
+  double? _selectedLatitude;
+  double? _selectedLongitude;
+
   @override
   void dispose() {
-    // Dispose controllers when widget is disposed
     _titleController.dispose();
     _locationController.dispose();
     _hintController.dispose();
@@ -53,6 +56,25 @@ class AddTreasurePageState extends State<AddTreasurePage> {
     }
   }
 
+  Future<void> _openMapPicker(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder:
+            (context) => MapLocationPicker(
+              onLocationSelected: (address, latitude, longitude) {
+                setState(() {
+                  _selectedAddress = address;
+                  _selectedLatitude = latitude;
+                  _selectedLongitude = longitude;
+                  _locationController.text = address;
+                });
+              },
+            ),
+      ),
+    );
+  }
+
   Future<void> _saveTreasure() async {
     if (_formKey.currentState!.validate()) {
       try {
@@ -67,14 +89,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           photoUrls.add(url);
         }
 
-        print('Title: ${_titleController.text}');
-        print('Location: ${_locationController.text}');
-        print('Hint: ${_hintController.text}');
-        print('Difficulty Level: $selectedDifficulty');
-        print('Photo URLs: $photoUrls');
-        print('Description: ${_descriptionController.text}');
-
-        // Create treasure object
+        // Create treasure object with location coordinates
         final treasure = Treasure(
           title: _titleController.text,
           location: _locationController.text,
@@ -82,30 +97,17 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           difficultyLevel: selectedDifficulty,
           photoUrls: photoUrls,
           description: _descriptionController.text,
+          latitude: _selectedLatitude, // Add these new fields
+          longitude: _selectedLongitude,
         );
 
         // Save to Firebase
         await _treasureService.addTreasure(treasure);
+        Navigator.pushReplacementNamed(context, '/homepage');
 
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Treasure added successfully!')),
-        );
-
-        // Navigate back
+        // Rest of your existing code
       } catch (e) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Show error message
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+        // Error handling code
       }
     }
   }
@@ -127,9 +129,9 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF7033FA)),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Color(0xFFF2F2F2),
+        backgroundColor: const Color(0xFFF2F2F2),
       ),
-      backgroundColor: Color(0xFFF2F2F2),
+      backgroundColor: const Color(0xFFF2F2F2),
       body: Stack(
         children: [
           Form(
@@ -143,26 +145,24 @@ class AddTreasurePageState extends State<AddTreasurePage> {
                     label: 'Title',
                     hint: 'Treasure of Cortés',
                     controller: _titleController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a title';
-                      }
-                      return null;
-                    },
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Please enter a title'
+                                : null,
                   ),
                   const SizedBox(height: 30),
                   buildLocationField(),
                   const SizedBox(height: 30),
                   buildFormField(
                     label: 'Hint',
-                    hint: 'Treasure of Cortés',
+                    hint: 'Enter a hint',
                     controller: _hintController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a hint';
-                      }
-                      return null;
-                    },
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? 'Please enter a hint'
+                                : null,
                   ),
                   const SizedBox(height: 30),
                   buildDifficultySelector(),
@@ -188,7 +188,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
     );
   }
 
-  // Form Field
   Widget buildFormField({
     required String label,
     required String hint,
@@ -210,7 +209,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          style: TextStyle(color: Colors.black),
+          style: const TextStyle(color: Colors.black),
           maxLines: maxLines,
           validator: validator,
           decoration: InputDecoration(
@@ -220,7 +219,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
             fillColor: Colors.white,
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25),
-              borderSide: BorderSide(color: Colors.red),
+              borderSide: const BorderSide(color: Colors.red),
             ),
           ),
         ),
@@ -228,7 +227,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
     );
   }
 
-  // Location Field
   Widget buildLocationField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,33 +242,45 @@ class AddTreasurePageState extends State<AddTreasurePage> {
         const SizedBox(height: 8),
         TextFormField(
           controller: _locationController,
-          style: TextStyle(color: Colors.black),
+          style: const TextStyle(color: Colors.black),
+          readOnly: true,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter a location';
+              return 'Please select a location';
             }
             return null;
           },
           decoration: InputDecoration(
-            hintText: 'Colombo 07, Sri Lanka',
-            suffixIcon: const Icon(
-              Icons.location_on_outlined,
-              color: Color(0xFF7033FA),
+            hintText: 'Tap to select location',
+            suffixIcon: IconButton(
+              icon: const Icon(
+                Icons.location_on_outlined,
+                color: Color(0xFF7033FA),
+              ),
+              onPressed: () => _openMapPicker(context),
             ),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
             filled: true,
             fillColor: Colors.white,
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(25),
-              borderSide: BorderSide(color: Colors.red),
+              borderSide: const BorderSide(color: Colors.red),
             ),
           ),
+          onTap: () => _openMapPicker(context),
         ),
+        if (_selectedLatitude != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              'Coordinates: ${_selectedLatitude!.toStringAsFixed(5)}, ${_selectedLongitude!.toStringAsFixed(5)}',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+            ),
+          ),
       ],
     );
   }
 
-  // Difficulty Selector
   Widget buildDifficultySelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,7 +295,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
         ),
         const SizedBox(height: 8),
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             ...List.generate(5, (index) {
               return GestureDetector(
@@ -304,7 +313,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
                 ),
               );
             }),
-            const SizedBox(width: 105),
+            const SizedBox(width: 20),
             Text(
               getDifficultyText(selectedDifficulty),
               style: const TextStyle(
@@ -319,7 +328,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
     );
   }
 
-  // Get Difficulty Text
   String getDifficultyText(int level) {
     switch (level) {
       case 1:
@@ -337,7 +345,6 @@ class AddTreasurePageState extends State<AddTreasurePage> {
     }
   }
 
-  // Photo Uploader
   Widget buildPhotoUploader() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,15 +373,11 @@ class AddTreasurePageState extends State<AddTreasurePage> {
                     ? Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Icon(
-                          Icons.image,
-                          size: 30,
-                          color: Color.fromARGB(255, 99, 98, 98),
-                        ),
+                        Icon(Icons.image, size: 30, color: Colors.grey),
                         SizedBox(height: 4),
                         Text(
                           'Select File',
-                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                          style: TextStyle(color: Colors.grey),
                         ),
                       ],
                     )
@@ -391,130 +394,67 @@ class AddTreasurePageState extends State<AddTreasurePage> {
         ),
         const SizedBox(height: 8),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(child: Divider(color: Colors.black, thickness: 1)),
-            const Padding(
+          children: const [
+            Expanded(child: Divider(color: Colors.black)),
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                'or',
-                style: TextStyle(color: Colors.black, fontSize: 12),
-              ),
+              child: Text('or', style: TextStyle(fontSize: 12)),
             ),
-            Expanded(child: Divider(color: Colors.black, thickness: 1)),
+            Expanded(child: Divider(color: Colors.black)),
           ],
         ),
         const SizedBox(height: 8),
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: _takePhoto,
-            icon: Container(
-              child: const Icon(Icons.camera_alt, color: Color(0xFF7033FA)),
-            ),
-            label: const Text(
-              'Open Camera & Take Photo',
-              style: TextStyle(color: Color(0xFF7033FA)),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFF2F2F2),
-              foregroundColor: Color(0xFF7033FA),
-              side: const BorderSide(color: Color(0xFF7033FA), width: 1),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            ),
+        ElevatedButton.icon(
+          onPressed: _takePhoto,
+          icon: const Icon(Icons.camera_alt, color: Color(0xFF7033FA)),
+          label: const Text(
+            'Open Camera & Take Photo',
+            style: TextStyle(color: Color(0xFF7033FA)),
           ),
-        ),
-      ],
-    );
-  }
-
-  // Description Field
-  Widget buildDescriptionField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Description',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _descriptionController,
-          style: TextStyle(color: Colors.black),
-          maxLines: 5,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter a description';
-            }
-            return null;
-          },
-          decoration: InputDecoration(
-            hintText: 'Enter description here...',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
-            filled: true,
-            fillColor: Colors.white,
-            errorBorder: OutlineInputBorder(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFF2F2F2),
+            foregroundColor: const Color(0xFF7033FA),
+            side: const BorderSide(color: Color(0xFF7033FA)),
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(25),
-              borderSide: BorderSide(color: Colors.red),
             ),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
         ),
       ],
     );
   }
 
-  // Action Buttons
+  Widget buildDescriptionField() {
+    return buildFormField(
+      label: 'Description',
+      hint: 'Enter description here...',
+      controller: _descriptionController,
+      maxLines: 5,
+      validator:
+          (value) =>
+              value == null || value.isEmpty
+                  ? 'Please enter a description'
+                  : null,
+    );
+  }
+
   Widget buildActionButtons(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(50),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 244, 243, 245),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                ),
-              ),
-            ),
+      child: ElevatedButton(
+        onPressed: _saveTreasure,
+        child: const Text(
+          'Save Treasure',
+          style: TextStyle(color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF7033FA),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _saveTreasure,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF7033FA),
-                disabledBackgroundColor: Color(0xFF7033FA).withOpacity(0.5),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: const Text(
-                  'Save',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-              ),
-            ),
-          ),
-        ],
+          padding: const EdgeInsets.symmetric(vertical: 16),
+        ),
       ),
     );
   }

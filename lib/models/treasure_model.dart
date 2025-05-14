@@ -10,6 +10,8 @@ class Treasure {
   final String description;
   final DateTime createdAt;
   final bool isFavorite;
+  final double? latitude;
+  final double? longitude;
 
   Treasure({
     this.id = '',
@@ -21,6 +23,8 @@ class Treasure {
     required this.description,
     DateTime? createdAt,
     this.isFavorite = false,
+    this.latitude,
+    this.longitude,
   }) : createdAt = createdAt ?? DateTime.now();
 
   // Convert Treasure to a Map for storing in Firebase
@@ -34,6 +38,8 @@ class Treasure {
       'description': description,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'isFavorite': isFavorite,
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 
@@ -47,6 +53,8 @@ class Treasure {
       difficultyLevel: map['difficultyLevel'] ?? 1,
       photoUrls: List<String>.from(map['photoUrls'] ?? []),
       description: map['description'] ?? '',
+      latitude: map['latitude']?.toDouble(),
+      longitude: map['longitude']?.toDouble(),
       createdAt:
           map['createdAt'] != null
               ? ((map['createdAt'] is Timestamp)

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:torva/models/treasure_model.dart';
+// You might need to import services for distance calculation if you want the "m Away" part
+// import 'package:torva/Services/location_service.dart'; // Example import
 
 class TreasureDetailScreen extends StatefulWidget {
   final Treasure treasure;
@@ -19,33 +21,39 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Parse location string (assuming format is "latitude,longitude")
-    final locationParts = widget.treasure.location.split(',');
-    if (locationParts.length == 2) {
-      try {
-        double lat = double.parse(locationParts[0].trim());
-        double lng = double.parse(locationParts[1].trim());
-        _treasureLocation = LatLng(lat, lng);
-      } catch (e) {
-        // Fallback to a default location if parsing fails
-        _treasureLocation = const LatLng(0, 0);
-      }
+
+    // --- THIS IS THE MODIFIED PART ---
+    // Use latitude and longitude directly from the Treasure model
+    if (widget.treasure.latitude != null && widget.treasure.longitude != null) {
+      _treasureLocation = LatLng(widget.treasure.latitude!, widget.treasure.longitude!);
     } else {
-      _treasureLocation = const LatLng(0, 0);
+      // Handle cases where lat/lng might be missing (shouldn't happen if AddTreasurePage validation is correct)
+      // You might want to show an error or navigate back in a real app
+      print('Error: Treasure ${widget.treasure.id} has missing latitude or longitude.');
+      _treasureLocation = const LatLng(0, 0); // Default to a fallback location
+       WidgetsBinding.instance.addPostFrameCallback((_) {
+         ScaffoldMessenger.of(context).showSnackBar(
+           const SnackBar(content: Text('Treasure location data is missing.')),
+         );
+       });
     }
 
-    // Create marker for treasure location
-    _markers.add(
-      Marker(
-        markerId: MarkerId(widget.treasure.id),
-        position: _treasureLocation,
-        infoWindow: InfoWindow(
-          title: widget.treasure.title,
-          snippet: widget.treasure.description,
+
+    // Create marker for treasure location using the obtained LatLng
+    if (_treasureLocation.latitude != 0 || _treasureLocation.longitude != 0) { // Only add marker if location is not the default fallback
+      _markers.add(
+        Marker(
+          markerId: MarkerId(widget.treasure.id),
+          position: _treasureLocation, // Position the marker using LatLng
+          infoWindow: InfoWindow(
+            title: widget.treasure.title,
+            snippet: widget.treasure.location, // Show the address in the info window
+          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
         ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
-      ),
-    );
+      );
+    }
+     // --- END OF MODIFIED PART ---
   }
 
   @override
@@ -59,6 +67,7 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
             child: Stack(
               children: [
                 GoogleMap(
+                  // Set the initial camera position using the obtained LatLng
                   initialCameraPosition: CameraPosition(
                     target: _treasureLocation,
                     zoom: 15,
@@ -67,6 +76,11 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
                   onMapCreated: (GoogleMapController controller) {
                     _mapController = controller;
                   },
+                  // Disable map interactions if location data is missing
+                  // zoomGesturesEnabled: (_treasureLocation.latitude != 0 || _treasureLocation.longitude != 0),
+                  // scrollGesturesEnabled: (_treasureLocation.latitude != 0 || _treasureLocation.longitude != 0),
+                  // tiltGesturesEnabled: (_treasureLocation.latitude != 0 || _treasureLocation.longitude != 0),
+                  // rotateGesturesEnabled: (_treasureLocation.latitude != 0 || _treasureLocation.longitude != 0),
                 ),
                 // Back button with transparent background
                 Positioned(
@@ -153,8 +167,8 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
                         5,
                         (index) => Icon(
                           index < widget.treasure.difficultyLevel
-                              ? Icons.star
-                              : Icons.star_border,
+                               ? Icons.star
+                               : Icons.star_border,
                           color: const Color(0xFF7033FA),
                           size: 20,
                         ),
@@ -163,7 +177,7 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Distance info
+                    // Location Address info (using the location string)
                     Row(
                       children: [
                         const Icon(
@@ -172,14 +186,38 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
                           size: 18,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          "${widget.treasure.location}m Away",
-                          style: TextStyle(
-                            color: const Color.fromARGB(255, 0, 0, 0),
+                        // Display the location string (address from picker)
+                        Expanded( // Use Expanded to prevent overflow
+                          child: Text(
+                            widget.treasure.location,
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0),
+                            ),
+                            overflow: TextOverflow.ellipsis, // Handle long addresses
                           ),
                         ),
+                         // If you want to display distance, you'd calculate it here
+                         // const SizedBox(width: 8),
+                         // Text("(${calculateDistance()}m Away)") // Example
                       ],
                     ),
+                    SizedBox(height: 8),
+                    // Coordinates info (optional, but helpful for debugging)
+                    if (widget.treasure.latitude != null && widget.treasure.longitude != null)
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.gps_fixed,
+                            color: Colors.grey,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 4),
+                           Text(
+                            'Lat: ${widget.treasure.latitude!.toStringAsFixed(5)}, Lng: ${widget.treasure.longitude!.toStringAsFixed(5)}',
+                             style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                           ),
+                        ],
+                      ),
                     SizedBox(height: 8),
                     Row(
                       children: [
@@ -189,10 +227,13 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
                           size: 18,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          "Hint - ${widget.treasure.hint}",
-                          style: TextStyle(
-                            color: const Color.fromARGB(255, 0, 0, 0),
+                        Expanded( // Use Expanded to prevent overflow
+                          child: Text(
+                            "Hint - ${widget.treasure.hint}",
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0),
+                            ),
+                            overflow: TextOverflow.ellipsis, // Handle long hints
                           ),
                         ),
                       ],
@@ -229,7 +270,7 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
                           ),
                         ),
                         onPressed: () {
-                          // Launch navigation
+                          
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -256,4 +297,6 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
       ),
     );
   }
+
+
 }
