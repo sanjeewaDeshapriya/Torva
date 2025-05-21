@@ -1,9 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import 'package:torva/models/treasure_model.dart';
+import 'package:torva/services/user_service.dart';
 import 'package:url_launcher/url_launcher.dart';
-// You might need to import services for distance calculation if you want the "m Away" part
-// import 'package:torva/Services/location_service.dart'; // Example import
 
 class TreasureDetailScreen extends StatefulWidget {
   final Treasure treasure;
@@ -78,49 +79,77 @@ class _TreasureDetailScreenState extends State<TreasureDetailScreen> {
 
   // Function to verify code submission>
   Future<void> _verifyCode() async {
-    if (_codeController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please enter a code')));
-      return;
-    }
+  if (_codeController.text.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please enter a code')),
+    );
+    return;
+  }
 
-    setState(() {
-      _verifyingCode = true;
-    });
+  setState(() {
+    _verifyingCode = true;
+  });
 
-    // Add a small delay to simulate verification
-    await Future.delayed(const Duration(seconds: 1));
+  await Future.delayed(const Duration(seconds: 1));
 
-    // Check if the entered code matches the treasure's code
-    if (widget.treasure.code != null &&
-        _codeController.text == widget.treasure.code) {
+  if (_codeController.text == widget.treasure.code) {
+    try {
+      // Step 1: Get current Firebase user
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+
+      if (firebaseUser != null) {
+        final email = firebaseUser.email!;
+        
+        // Step 2: Fetch user model from Firestore
+        final user = await UserService().getUserByEmail(email);
+
+        if (user != null) {
+          final alreadyFound = user.finds?.contains(widget.treasure.id) ?? false;
+
+          if (!alreadyFound) {
+            // Step 3: Update user's points and finds
+            final updatedUser = user.copyWith(
+              points: (user.points ?? 0) + 10,
+              finds: [...(user.finds ?? []), widget.treasure.id],
+            );
+
+            await UserService().updateUser(updatedUser);
+          }
+        }
+      }
+
       setState(() {
         _codeSubmitted = true;
         _verifyingCode = false;
       });
 
-      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Code verified! Treasure found!'),
           backgroundColor: Colors.green,
         ),
       );
-    } else {
-      setState(() {
-        _verifyingCode = false;
-      });
-
-      // Show error message
+    } catch (e) {
+      print('Error verifying code: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Incorrect code. Try again!'),
+        SnackBar(
+          content: Text('An error occurred: ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
+      setState(() => _verifyingCode = false);
     }
+  } else {
+    setState(() => _verifyingCode = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Incorrect code. Try again!'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
+
 
   // Function to open navigation
   Future<void> _navigateToLocation() async {
