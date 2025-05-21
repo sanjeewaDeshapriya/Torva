@@ -24,6 +24,8 @@ class AddTreasurePageState extends State<AddTreasurePage> {
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _hintController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _codeController =
+      TextEditingController(); // New controller for code
 
   String _selectedAddress = '';
   double? _selectedLatitude;
@@ -35,6 +37,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
     _locationController.dispose();
     _hintController.dispose();
     _descriptionController.dispose();
+    _codeController.dispose(); // Dispose code controller
     super.dispose();
   }
 
@@ -89,7 +92,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           photoUrls.add(url);
         }
 
-        // Create treasure object with location coordinates
+        // Create treasure object with location coordinates and code
         final treasure = Treasure(
           title: _titleController.text,
           location: _locationController.text,
@@ -97,8 +100,12 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           difficultyLevel: selectedDifficulty,
           photoUrls: photoUrls,
           description: _descriptionController.text,
-          latitude: _selectedLatitude, // Add these new fields
+          latitude: _selectedLatitude,
           longitude: _selectedLongitude,
+          code:
+              _codeController.text.isNotEmpty
+                  ? _codeController.text
+                  : null, // Add code
         );
 
         // Save to Firebase
@@ -127,7 +134,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF7033FA)),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pushNamed(context, '/homepage'),
         ),
         backgroundColor: const Color(0xFFF2F2F2),
       ),
@@ -163,6 +170,15 @@ class AddTreasurePageState extends State<AddTreasurePage> {
                             value == null || value.isEmpty
                                 ? 'Please enter a hint'
                                 : null,
+                  ),
+                  const SizedBox(height: 30),
+                  // Add code field
+                  buildFormField(
+                    label: 'Secret Code (Optional)',
+                    hint: 'Enter a secret code for this treasure',
+                    controller: _codeController,
+                    validator:
+                        (value) => null, // Optional field, no validation needed
                   ),
                   const SizedBox(height: 30),
                   buildDifficultySelector(),

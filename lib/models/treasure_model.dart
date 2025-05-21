@@ -12,6 +12,7 @@ class Treasure {
   final bool isFavorite;
   final double? latitude;
   final double? longitude;
+  final String? code;
 
   Treasure({
     this.id = '',
@@ -25,6 +26,7 @@ class Treasure {
     this.isFavorite = false,
     this.latitude,
     this.longitude,
+    this.code,
   }) : createdAt = createdAt ?? DateTime.now();
 
   // Convert Treasure to a Map for storing in Firebase
@@ -40,6 +42,7 @@ class Treasure {
       'isFavorite': isFavorite,
       'latitude': latitude,
       'longitude': longitude,
+      'code': code,
     };
   }
 
@@ -61,7 +64,8 @@ class Treasure {
                   ? (map['createdAt'] as Timestamp).toDate()
                   : DateTime.fromMillisecondsSinceEpoch(map['createdAt']))
               : DateTime.now(),
-              isFavorite: map['isFavorite'] ?? false,
+      isFavorite: map['isFavorite'] ?? false,
+      code: map['code'],
     );
   }
 
@@ -76,6 +80,7 @@ class Treasure {
     String? description,
     DateTime? createdAt,
     bool? isFavorite,
+   
   }) {
     return Treasure(
       id: id ?? this.id,
@@ -87,6 +92,7 @@ class Treasure {
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
       isFavorite: isFavorite ?? this.isFavorite,
+      
     );
   }
 }
