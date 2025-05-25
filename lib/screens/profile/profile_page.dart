@@ -131,8 +131,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       SizedBox(height: 10),
                       InfoCard(
                         icon: Icons.file_present_sharp,
-                        title: 'Add Treasure',
-                        onTap: () => _navigateToAddTreasure(),
+                        title: 'About Us',
+                        onTap: () => (Navigator.pushNamed(context, '/about')),
                       ),
                       SizedBox(height: 10),
                       InfoCard(

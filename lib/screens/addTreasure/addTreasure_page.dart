@@ -102,19 +102,86 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           description: _descriptionController.text,
           latitude: _selectedLatitude,
           longitude: _selectedLongitude,
-          code:
-              _codeController.text.isNotEmpty
-                  ? _codeController.text
-                  : null, // Add code
+          code: _codeController.text.isNotEmpty ? _codeController.text : null,
         );
 
         // Save to Firebase
         await _treasureService.addTreasure(treasure);
-        Navigator.pushReplacementNamed(context, '/homepage');
 
-        // Rest of your existing code
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Show success notification
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Treasure Added Successfully!',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '"${_titleController.text}" has been added to your collection.',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 4),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
+
+        // Navigate back to homepage after a short delay to show the notification
+        await Future.delayed(const Duration(milliseconds: 500));
+        Navigator.pushReplacementNamed(context, '/homepage');
       } catch (e) {
-        // Error handling code
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Show error notification
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white, size: 24),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Failed to add treasure. Please try again.',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
       }
     }
   }
@@ -174,11 +241,15 @@ class AddTreasurePageState extends State<AddTreasurePage> {
                   const SizedBox(height: 30),
                   // Add code field
                   buildFormField(
-                    label: 'Secret Code (Optional)',
+                    label: 'Secret Code (Required)',
                     hint: 'Enter a secret code for this treasure',
                     controller: _codeController,
-                    validator:
-                        (value) => null, // Optional field, no validation needed
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Secret code is required';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 30),
                   buildDifficultySelector(),
