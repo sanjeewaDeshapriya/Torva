@@ -23,7 +23,7 @@ class _ContactPageState extends State<ContactPage> {
     _nameController.text = 'Sameera Jayakodi';
     _emailController.text = 'sameerajayakodi456@gmail.com';
     _phoneController.text = '0770309842';
-    _addressController.text = '123 Main Street, City, Country';
+    _addressController.text = 'Homagama, Sri Lanka';
   }
 
   @override
