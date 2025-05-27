@@ -25,7 +25,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
   final TextEditingController _hintController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _codeController =
-      TextEditingController(); // New controller for code
+      TextEditingController();
 
   String _selectedAddress = '';
   double? _selectedLatitude;
@@ -85,7 +85,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
           _isLoading = true;
         });
 
-        // Upload image if selected
+        
         List<String> photoUrls = [];
         if (_image != null) {
           String url = await _treasureService.uploadImage(_image!);
@@ -239,7 +239,7 @@ class AddTreasurePageState extends State<AddTreasurePage> {
                                 : null,
                   ),
                   const SizedBox(height: 30),
-                  // Add code field
+                  
                   buildFormField(
                     label: 'Secret Code (Required)',
                     hint: 'Enter a secret code for this treasure',
