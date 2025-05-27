@@ -132,7 +132,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       InfoCard(
                         icon: Icons.file_present_sharp,
                         title: 'About Us',
-                        onTap: () => (Navigator.pushNamed(context, '/about')),
+                        onTap: () => (Navigator.pushNamed(context, '/contact')),
                       ),
                       SizedBox(height: 10),
                       InfoCard(
