@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:torva/models/user.dart';
+import 'package:torva/services/user_service.dart';
 import 'package:torva/screens/home/home_page.dart';
 
 class LeaderboardScreen extends StatefulWidget {
@@ -9,24 +11,16 @@ class LeaderboardScreen extends StatefulWidget {
 }
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
-  int _selectedIndex = 0; // Track selected index for bottom navigation
+  int _selectedIndex =
+      2;
+  final UserService _userService = UserService();
+  late Stream<List<UserModel>> _usersStream;
 
-  final List<Map<String, dynamic>> users = [
-
-    {'name': 'Rathne', 'points': 9558, 'image': 'assets/profile1.jpg', 'rank': 1},
-    {'name': 'NippaX', 'points': 6589, 'image': 'assets/profile1.jpg', 'rank': 2},
-    {'name': 'ItsMeJithe', 'points': 1582, 'image': 'assets/profile1.jpg', 'rank': 5},
-    {'name': 'Chikuba', 'points': 2560, 'image': 'assets/profile1.jpg', 'rank': 3},
-    {'name': 'Rave', 'points': 2560, 'image': 'assets/profile1.jpg', 'rank': 4},
-    {'name': 'Samiya', 'points': 4120, 'image': 'assets/profile1.jpg', 'rank': 5},
-    {'name': 'Samiya', 'points': 4120, 'image': 'assets/profile1.jpg', 'rank': 5},
-    {'name': 'Samiya', 'points': 4120, 'image': 'assets/profile1.jpg', 'rank': 5},
-    {'name': 'Samiya', 'points': 4120, 'image': 'assets/profile1.jpg', 'rank': 5},
-    {'name': 'Samiya', 'points': 4120, 'image': 'assets/profile1.jpg', 'rank': 5},
-    {'name': 'Sanju', 'points': 782, 'image': 'assets/profile1.jpg', 'rank': 6},
-    {'name': 'Rathne', 'points': 9558, 'image': 'assets/profile1.jpg', 'rank': 1},
-    {'name': 'KingAshan', 'points': 2550, 'image': 'assets/profile1.jpg', 'rank': 8},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _usersStream = _userService.getUsers();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +29,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Text(
+        title: const Text(
           'Leaderboard',
           style: TextStyle(
             color: Color(0xFF7033FA),
@@ -45,112 +39,85 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF7033FA)),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pushReplacementNamed(context, '/homepage'),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.favorite_border, color: Color(0xFF7033FA)),
-            onPressed: () {},
-          ),
-        ],
+
         centerTitle: true,
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 5),
-        child: ListView.builder(
-          padding: EdgeInsets.symmetric(vertical: 20),
-          itemCount: users.length,
-          itemBuilder: (context, index) {
-            return leaderboardItem(users[index]);
-          },
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        margin: EdgeInsets.only(bottom: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 5,
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-              icon: Icon(Icons.home_max_rounded, color: _selectedIndex == 0 ? Color(0xFF7033FA) : Colors.grey, size: 40),
-              onPressed: () {
-                Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
-                setState(() {
-                  _selectedIndex = 0;
-                });
+      body: StreamBuilder<List<UserModel>>(
+        stream: _usersStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error fetching users: ${snapshot.error}'),
+            );
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No users found.'));
+          }
+
+          // Sort users by points in descending order
+          final sortedUsers =
+              snapshot.data!
+                ..sort((a, b) => (b.points ?? 0).compareTo(a.points ?? 0));
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              itemCount: sortedUsers.length,
+              itemBuilder: (context, index) {
+                final user = sortedUsers[index];
+                return _leaderboardItem(user, index + 1);
               },
             ),
-            IconButton(
-              icon: Icon(Icons.favorite_border_outlined, color: _selectedIndex == 1 ? Color(0xFF7033FA) : Colors.grey, size: 40),
-              onPressed: () {
-                setState(() {
-                  _selectedIndex = 1;
-                });
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.emoji_events_outlined, color: _selectedIndex == 2 ? Color(0xFF7033FA) : Colors.grey, size: 40),
-              onPressed: () {
-                setState(() {
-                  _selectedIndex = 2;
-                });
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.person_outline, color: _selectedIndex == 3 ? Color(0xFF7033FA) : Colors.grey, size: 40),
-              onPressed: () {
-                setState(() {
-                  _selectedIndex = 3;
-                });
-              },
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget leaderboardItem(Map<String, dynamic> user) {
+  Widget _leaderboardItem(UserModel user, int rank) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-      padding: EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5)],
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 25,
-            backgroundImage: AssetImage(user['image']),
+            backgroundImage:
+                user.photoURL != null
+                    ? NetworkImage(user.photoURL!)
+                    : const AssetImage('assets/profile1.jpg') as ImageProvider,
+            
           ),
-          SizedBox(width: 15),
+          const SizedBox(width: 15),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(user['name'],
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-                Text("${user['points']} Points",
-                    style: TextStyle(fontSize: 14, color: Colors.grey)),
+                Text(
+                  user.username,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                Text(
+                  "${user.points ?? 0} Points",
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
               ],
             ),
           ),
@@ -158,22 +125,21 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             alignment: Alignment.center,
             children: [
               Icon(
-                user['rank'] <= 3
-                    ? Icons.star_rounded
-                    : Icons.star_border_rounded,
-                color: user['rank'] == 1
-                    ? Colors.yellow
-                    : user['rank'] == 2
+                rank <= 3 ? Icons.star_rounded : Icons.star_border_rounded,
+                color:
+                    rank == 1
+                        ? Colors.yellow
+                        : rank == 2
                         ? Colors.grey
-                        : user['rank'] == 3
-                            ? Colors.brown
-                            : Color(0xFF7033FA),
+                        : rank == 3
+                        ? Colors.brown
+                        : const Color(0xFF7033FA),
                 size: 40,
               ),
               Text(
-                user['rank'].toString(),
+                rank.toString(),
                 style: TextStyle(
-                  color: user['rank'] <= 3 ? Colors.white : Color(0xFF7033FA),
+                  color: rank <= 3 ? Colors.white : const Color(0xFF7033FA),
                   fontWeight: FontWeight.w800,
                   fontSize: 10,
                 ),

@@ -44,12 +44,12 @@ class DescriptionScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(
                     10,
-                  ), // Adjust the radius for rounding
+                  ),
                   image: DecorationImage(
                     image: AssetImage(
                       'assets/profile1.jpg',
-                    ), // Change as needed
-                    fit: BoxFit.cover, // Adjust how the image fits
+                    ),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -152,7 +152,7 @@ class DescriptionScreen extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () {
-                                // Add your save functionality here
+                              
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Color(0xFF7033FA),
