@@ -167,24 +167,10 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     ).then(
       (_) => _loadUserData(),
-    ); // Reload user data after returning from edit page
+    ); 
   }
 
-  void _navigateToFinds() {
-    // Navigate to finds page
-  }
-
-  void _navigateToHides() {
-    // Navigate to hides page
-  }
-
-  void _navigateToAddTreasure() {
-    // Navigate to add treasure page
-  }
-
-  void _navigateToSettings() {
-    // Navigate to settings page
-  }
+  
 }
 
 // EditProfilePage for updating user profile
