@@ -20,9 +20,9 @@ class _ContactPageState extends State<ContactPage> {
   void initState() {
     super.initState();
     // Initialize with some default values
-    _nameController.text = 'John Doe';
-    _emailController.text = 'john.doe@example.com';
-    _phoneController.text = '+1 (555) 123-4567';
+    _nameController.text = 'Sameera Jayakodi';
+    _emailController.text = 'sameerajayakodi456@gmail.com';
+    _phoneController.text = '0770309842';
     _addressController.text = '123 Main Street, City, Country';
   }
 
