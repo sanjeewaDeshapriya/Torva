@@ -12,7 +12,7 @@ class LeaderboardScreen extends StatefulWidget {
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   int _selectedIndex =
-      2; // Track selected index for bottom navigation, default to leaderboard
+      2;
   final UserService _userService = UserService();
   late Stream<List<UserModel>> _usersStream;
 
@@ -99,7 +99,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 user.photoURL != null
                     ? NetworkImage(user.photoURL!)
                     : const AssetImage('assets/profile1.jpg') as ImageProvider,
-            // You might want to have a default profile image
+            
           ),
           const SizedBox(width: 15),
           Expanded(
