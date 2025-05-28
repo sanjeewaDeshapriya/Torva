@@ -30,7 +30,7 @@ class AppRoutes {
     return {
       home: (context) => Wrapper(),
       about: (context) => AboutPage(),
-      contact: (context) => ContactUsPage(),
+      contact: (context) => ContactPage(),
       addTreasure: (context) => AddTreasurePage(),
       description: (context) => DescriptionScreen(),
       leadingboard: (context) => LeaderboardScreen(),
