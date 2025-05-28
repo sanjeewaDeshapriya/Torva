@@ -43,7 +43,9 @@ class _ContactUsPageState extends State<ContactUsPage> {
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Message sent successfully! We\'ll get back to you soon.'),
+          content: Text(
+            'Message sent successfully! We\'ll get back to you soon.',
+          ),
           backgroundColor: Color(0xFF7C3AED),
         ),
       );
@@ -136,7 +138,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                     child: _buildContactInfoCard(
                       icon: Icons.email_outlined,
                       title: 'Email',
-                      subtitle: 'sameerajayakodi456@gmail.com',
+                      subtitle: 'Team@torva.com',
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -144,7 +146,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                     child: _buildContactInfoCard(
                       icon: Icons.phone_outlined,
                       title: 'Phone',
-                      subtitle: '+94 77 030 9842',
+                      subtitle: '011 45 45 254',
                     ),
                   ),
                 ],
@@ -202,7 +204,9 @@ class _ContactUsPageState extends State<ContactUsPage> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your email';
                               }
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                              if (!RegExp(
+                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                              ).hasMatch(value)) {
                                 return 'Please enter a valid email';
                               }
                               return null;
@@ -275,23 +279,26 @@ class _ContactUsPageState extends State<ContactUsPage> {
                           elevation: 0,
                           disabledBackgroundColor: Colors.grey.shade400,
                         ),
-                        child: _isSubmitting
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        child:
+                            _isSubmitting
+                                ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                                : const Text(
+                                  'Send Message',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              )
-                            : const Text(
-                                'Send Message',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
                       ),
                     ),
                   ],
@@ -320,7 +327,10 @@ class _ContactUsPageState extends State<ContactUsPage> {
                         const SizedBox(width: 16),
                         _buildSocialButton(Icons.link, () {}), // LinkedIn
                         const SizedBox(width: 16),
-                        _buildSocialButton(Icons.alternate_email, () {}), // Twitter
+                        _buildSocialButton(
+                          Icons.alternate_email,
+                          () {},
+                        ), // Twitter
                       ],
                     ),
                   ],
@@ -348,7 +358,8 @@ class _ContactUsPageState extends State<ContactUsPage> {
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
-        crossAxisAlignment: fullWidth ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment:
+            fullWidth ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
           Icon(icon, color: const Color(0xFF7C3AED), size: 28),
           const SizedBox(height: 12),
@@ -363,10 +374,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             textAlign: fullWidth ? TextAlign.start : TextAlign.center,
           ),
         ],
@@ -410,7 +418,10 @@ class _ContactUsPageState extends State<ContactUsPage> {
         ),
         filled: true,
         fillColor: Colors.grey.shade50,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
     );
   }
