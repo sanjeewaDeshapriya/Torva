@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:torva/screens/contact/contact_page.dart';
 
 import 'package:torva/screens/description/description_page.dart';
 import 'package:torva/screens/home/home_page.dart';
@@ -7,9 +9,9 @@ import 'package:torva/screens/leadingBoard/leadingBoard_page.dart';
 import 'package:torva/screens/profile/profile_page.dart';
 import 'package:torva/authentication/authentication/login.dart';
 import 'package:torva/authentication/wrapper.dart';
+import 'package:torva/screens/settings/settings_page.dart';
 import 'package:torva/screens/treasurelist/treasure_list.dart';
 import '../screens/about/about_page.dart';
-import '../screens/contact/contact_page.dart';
 import '../screens/addTreasure/addTreasure_page.dart';
 
 class AppRoutes {
@@ -24,13 +26,14 @@ class AppRoutes {
   static const String login = '/login';
   static const String treasurelist = '/treasurelist';
   static const String homepage = '/homepage';
+  static const String settings = '/settings';
 
 
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       home: (context) => Wrapper(),
       about: (context) => AboutPage(),
-      contact: (context) => ContactPage(),
+      contact: (context) => ContactUsPage(),
       addTreasure: (context) => AddTreasurePage(),
       description: (context) => DescriptionScreen(),
       leadingboard: (context) => LeaderboardScreen(),
@@ -38,7 +41,8 @@ class AppRoutes {
       wrapper: (context) => Wrapper(),
       login: (context) => Login(),
       treasurelist: (context) => TreasureListScreen(),
-      homepage: (context) => HomePage(), // Assuming you have a HomePage widget
+      homepage: (context) => HomePage(),
+      settings:(context)=> SettingsPage(), // Assuming you have a HomePage widget
     };
   }
 }
