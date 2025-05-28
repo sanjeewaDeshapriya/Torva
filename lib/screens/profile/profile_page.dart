@@ -120,13 +120,13 @@ class _ProfilePageState extends State<ProfilePage> {
                       InfoCard(
                         icon: Icons.assignment_turned_in,
                         title: 'Finds (${_currentUser?.finds?.length ?? 0})',
-                        onTap: () => _navigateToFinds(),
+                        onTap: () =>(),
                       ),
                       SizedBox(height: 10),
                       InfoCard(
                         icon: Icons.key,
                         title: 'Hides (${_currentUser?.hides?.length ?? 0})',
-                        onTap: () => _navigateToHides(),
+                        onTap: () => (),
                       ),
                       SizedBox(height: 10),
                       InfoCard(
@@ -138,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       InfoCard(
                         icon: Icons.settings,
                         title: 'Settings',
-                        onTap: () => _navigateToSettings(),
+                        onTap: () => (),
                       ),
                       SizedBox(height: 10),
                       InfoCard(
