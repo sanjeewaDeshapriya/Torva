@@ -126,7 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       InfoCard(
                         icon: Icons.key,
                         title: 'Hides (${_currentUser?.hides?.length ?? 0})',
-                        onTap: () => _navigateToHides,
+                        onTap: () => _navigateToHides(),
                       ),
                       SizedBox(height: 10),
                       InfoCard(
@@ -138,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       InfoCard(
                         icon: Icons.settings,
                         title: 'Settings',
-                        onTap: () =>  _navigateToSettings,
+                        onTap: () =>  _navigateToSettings(),
                       ),
                       SizedBox(height: 10),
                       InfoCard(
