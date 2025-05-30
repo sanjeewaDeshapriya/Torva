@@ -159,17 +159,6 @@ lib/
 - **Daily Quests** and reward systems
 - **Offline Map Support** for areas with limited connectivity
 
-## 👥 Contributors
-
-Special thanks to all developers who contributed to this project:
-
-- **Authentication System** - Sign in/up functionality and user management
-- **Treasure Management** - Creation, editing, and discovery features  
-- **User Interface** - Profile screens, settings, and welcome pages
-- **Leaderboard System** - Points tracking and ranking features
-- **Maps Integration** - Location services and navigation
-- **Backend Services** - Firebase integration and API development
-
 
 ### Development Guidelines
 
